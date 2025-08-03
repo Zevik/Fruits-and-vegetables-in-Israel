@@ -429,56 +429,49 @@
             }
         }
         @media (max-width: 480px) {
-             nav ul {
-                flex-direction: column;
-                width: 100%;
-                text-align: center;
-            }
-            th, td {
-                padding: 12px 10px;
-                font-size: 0.9rem;
-            }
-            .solution-item {
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
-            }
-            .back-to-top {
-                bottom: 15px;
-                left: 15px;
-                width: 50px;
-                height: 50px;
-            }
-            nav.compact {
-                padding: 0;
-                box-shadow: var(--shadow-md);
-            }
-            nav.compact .container {
-                padding: 0 10px;
-                justify-content: flex-start;
-            }
-            nav.compact ul {
-                flex-direction: row;
-                gap: 0;
-                width: auto;
-                overflow-x: auto;
-                justify-content: flex-start;
-            }
-            nav.compact ul li {
-                display: none;
-            }
-            nav.compact ul li.active {
-                display: block;
-            }
-            nav.compact ul li a {
-                font-size: 1.1rem;
-                padding: 10px 18px;
-                border-radius: 0;
-                background: var(--primary-color);
-                color: #fff;
-                font-weight: 700;
-                box-shadow: none;
-            }
+    /* ... הגדרות אחרות ... */
+    nav ul {
+        flex-direction: row; /* שינינו מ-column ל-row */
+        width: 100%;
+        text-align: center;
+        justify-content: center; /* ממקם את הפריט במרכז */
+        overflow-x: hidden; /* מונע גלילה מיותרת */
+    }
+
+    nav ul li {
+        display: none; /* מסתיר את כל הפריטים כברירת מחדל */
+    }
+
+    nav ul li.active {
+        display: block; /* מציג רק את הפריט הפעיל */
+    }
+    
+    nav ul li a {
+        font-size: 1.1rem;
+        padding: 10px 18px;
+        border-radius: 0;
+        background: var(--primary-color);
+        color: #fff;
+        font-weight: 700;
+        box-shadow: none;
+    }
+
+    th, td {
+        padding: 12px 10px;
+        font-size: 0.9rem;
+    }
+    .solution-item {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    .back-to-top {
+        bottom: 15px;
+        left: 15px;
+        width: 50px;
+        height: 50px;
+    }
+    /* ... שאר ההגדרות ... */
         }
         
         /* --- עיצוב למסכים גדולים --- */
@@ -784,18 +777,6 @@
                         link.classList.add('active');
                     }
                 });
-
-                // Mobile compact nav after hero
-                if (window.innerWidth <= 480) {
-                    const hero = document.querySelector('.hero');
-                    if (window.scrollY > (hero.offsetHeight - navbar.offsetHeight)) {
-                        navbar.classList.add('compact');
-                    } else {
-                        navbar.classList.remove('compact');
-                    }
-                } else {
-                    navbar.classList.remove('compact');
-                }
             };
 
             window.addEventListener('scroll', onScroll, { passive: true });
