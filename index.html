@@ -472,15 +472,13 @@
             z-index: 1010;
         }
         
-        /* ====== קוד להפיכת טבלה לכרטיסיות במובייל ====== */
+        /* ====== קוד חדש ומשופר להפיכת טבלה לכרטיסיות במובייל ====== */
         @media screen and (max-width: 768px) {
             
-            /* 1. הסתרת כותרות הטבלה המקוריות */
             .table-container thead {
                 display: none;
             }
 
-            /* 2. ביטול מבנה הטבלה והפיכת כל שורה לכרטיס */
             .table-container table, 
             .table-container tbody, 
             .table-container tr, 
@@ -490,7 +488,7 @@
             }
 
             .table-container tr {
-                margin-bottom: 20px; /* רווח בין הכרטיסים */
+                margin-bottom: 25px; /* הגדלת רווח בין הכרטיסים */
                 border: 1px solid var(--light-gray);
                 border-radius: var(--border-radius);
                 overflow: hidden;
@@ -498,43 +496,51 @@
             }
             
             .table-container td {
-                text-align: right;
-                padding-left: 50%; /* נותן מקום לתווית בצד ימין */
-                position: relative;
-                padding-top: 15px;
-                padding-bottom: 15px;
-                border-bottom: 1px dotted var(--light-gray);
+                text-align: right; /* יישור כללי לימין */
+                padding: 12px 15px; /* ריווח פנימי אחיד */
+                border-bottom: 1px solid #f0f0f0;
             }
+            
             .table-container tr td:last-child {
-                border-bottom: none; /* הסרת קו תחתון מהתא האחרון בכל כרטיס */
+                border-bottom: none;
             }
 
-            /* 3. יצירת התווית (שם העמודה) מתוך ה-data-label */
+            /* החלק החשוב: הצבת התווית מעל התוכן */
             .table-container td::before {
-                content: attr(data-label); /* לוקח את הטקסט מה-data-label */
-                position: absolute;
-                top: 50%;
-                right: 15px; /* מיקום התווית בצד ימין */
-                transform: translateY(-50%);
+                content: attr(data-label);
+                display: block; /* גורם לתווית לתפוס שורה משלה */
                 font-weight: 700;
                 color: var(--primary-color);
-                width: 45%; /* הגבלת רוחב התווית */
-                text-align: right;
+                font-size: 0.9rem; /* גודל פונט קטן יותר לתווית */
+                margin-bottom: 5px; /* רווח בין התווית לתוכן */
             }
 
-            /* 4. עיצוב מיוחד לתא הראשון בכל כרטיס (השחקן) */
+            /* עיצוב מחדש של התא הראשון (שם השחקן) שיהיה כותרת הכרטיס */
             .table-container td:first-child {
                 background-color: var(--primary-color);
                 color: white;
-                font-size: 1.3rem;
-                padding-top: 20px;
-                padding-bottom: 20px;
+                font-size: 1.4rem;
+                font-weight: 700;
+                padding-top: 15px;
+                padding-bottom: 15px;
             }
+            /* אין צורך בתווית "השחקן" כשהוא משמש ככותרת */
             .table-container td:first-child::before {
-                display: none; /* אין צורך בתווית "השחקן" */
+                display: none; 
             }
             .table-container td:first-child strong {
                 color: white;
+            }
+            
+            /* הגדלת הפונט בפסקאות ורשימות לקריאות טובה יותר */
+            p, li {
+                font-size: 1.15rem; /* הגדלה קלה של הפונט */
+                line-height: 1.9;  /* הגדלת ריווח השורות */
+            }
+
+            /* הקטנה קלה של כותרות משנה כדי לשמור על היררכיה */
+            h3 {
+                font-size: 2rem;
             }
         }
         
