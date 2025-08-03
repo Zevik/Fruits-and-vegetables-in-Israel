@@ -483,6 +483,47 @@
                 grid-template-columns: repeat(2, 1fr);
             }
         }
+        /* ====== קוד לתיקון תצוגת מובייל ====== */
+        @media (max-width: 480px) {
+            /* --- תיקון 1: הקטנת הרווחים וגודל הטקסט באזור ה-Hero --- */
+            .hero {
+                padding-top: 60px !important;
+                padding-bottom: 50px !important;
+                background-attachment: scroll !important;
+            }
+
+            .hero p[style*="font-size:2.8rem"] {
+                font-size: 1.7rem !important;
+                line-height: 1.4 !important;
+                margin-bottom: 20px !important;
+            }
+
+            /* --- תיקון 2: סידור תפריט הניווט שיהיה קומפקטי תמיד --- */
+            nav ul {
+                flex-direction: row;
+                width: 100%;
+                justify-content: center;
+                gap: 0;
+                overflow-x: hidden;
+            }
+
+            nav ul li {
+                display: none;
+            }
+
+            nav ul li.active {
+                display: block;
+            }
+            
+            nav ul li a {
+                padding: 8px 18px;
+                font-size: 1.1rem;
+                font-weight: 700;
+                border-radius: 0;
+                background: var(--primary-color);
+                color: #fff;
+            }
+        }
     </style>
 </head>
 <body>
