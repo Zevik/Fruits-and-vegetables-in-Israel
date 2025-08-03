@@ -472,6 +472,72 @@
             z-index: 1010;
         }
         
+        /* ====== קוד להפיכת טבלה לכרטיסיות במובייל ====== */
+        @media screen and (max-width: 768px) {
+            
+            /* 1. הסתרת כותרות הטבלה המקוריות */
+            .table-container thead {
+                display: none;
+            }
+
+            /* 2. ביטול מבנה הטבלה והפיכת כל שורה לכרטיס */
+            .table-container table, 
+            .table-container tbody, 
+            .table-container tr, 
+            .table-container td {
+                display: block;
+                width: 100%;
+            }
+
+            .table-container tr {
+                margin-bottom: 20px; /* רווח בין הכרטיסים */
+                border: 1px solid var(--light-gray);
+                border-radius: var(--border-radius);
+                overflow: hidden;
+                box-shadow: var(--shadow-sm);
+            }
+            
+            .table-container td {
+                text-align: right;
+                padding-left: 50%; /* נותן מקום לתווית בצד ימין */
+                position: relative;
+                padding-top: 15px;
+                padding-bottom: 15px;
+                border-bottom: 1px dotted var(--light-gray);
+            }
+            .table-container tr td:last-child {
+                border-bottom: none; /* הסרת קו תחתון מהתא האחרון בכל כרטיס */
+            }
+
+            /* 3. יצירת התווית (שם העמודה) מתוך ה-data-label */
+            .table-container td::before {
+                content: attr(data-label); /* לוקח את הטקסט מה-data-label */
+                position: absolute;
+                top: 50%;
+                right: 15px; /* מיקום התווית בצד ימין */
+                transform: translateY(-50%);
+                font-weight: 700;
+                color: var(--primary-color);
+                width: 45%; /* הגבלת רוחב התווית */
+                text-align: right;
+            }
+
+            /* 4. עיצוב מיוחד לתא הראשון בכל כרטיס (השחקן) */
+            .table-container td:first-child {
+                background-color: var(--primary-color);
+                color: white;
+                font-size: 1.3rem;
+                padding-top: 20px;
+                padding-bottom: 20px;
+            }
+            .table-container td:first-child::before {
+                display: none; /* אין צורך בתווית "השחקן" */
+            }
+            .table-container td:first-child strong {
+                color: white;
+            }
+        }
+        
         .hamburger-menu span {
             display: block;
             height: 3px;
@@ -718,37 +784,37 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td><strong>מגדלים גדולים</strong></td>
-                                <td class="status-win">✅ מנצחים</td>
-                                <td>מרוויחים מהפער בין מחיר מכירה מלאכותי-גבוה לעלויות ייצור נמוכות.</td>
-                                <td>רואים עצמם כמגנים על ביטחון המזון והייצור המקומי.</td>
-                            </tr>
-                            <tr>
-                                <td><strong>חקלאי קטן/בינוני</strong></td>
-                                <td class="status-lose">❌ מפסיד</td>
-                                <td>מוכר במחיר גבוה אך עם עלויות גבוהות. שולי הרווח אפסיים וסופג את כל הסיכון.</td>
-                                <td>נאבק על הישרדות וזקוק לתמיכה ישירה כדי להתקיים.</td>
-                            </tr>
-                            <tr>
-                                <td><strong>רשתות שיווק</strong></td>
-                                <td class="status-neutral">⚠️ מרוויח-מפסיד</td>
-                                <td>מרוויחות מכוחן, אך סופגות עלויות בזבוז אדירות (עד 46%) ומגלגלות לצרכן.</td>
-                                <td>טוענות לרווח נקי נמוך (3-5%) ולתחרות קשה מול רשתות אחרות.</td>
-                            </tr>
-                            <tr>
-                                <td><strong>הצרכן</strong></td>
-                                <td class="status-lose">❌ מפסיד ראשי</td>
-                                <td>משלם מחיר סופי המגלם את כל כשלי המערכת: מחיר בסיס, תיווך ובזבוז.</td>
-                                <td>דורש שקיפות, תחרות הוגנת ומחירים ברי-השגה.</td>
-                            </tr>
-                             <tr>
-                                <td><strong>ממשלה</strong></td>
-                                <td class="status-neutral">⚠️ אחראית-מתקנת</td>
-                                <td>אחראית לכשלים רגולטוריים ותשתיתיים, אך גם מקדמת רפורמות.</td>
-                                <td>מתמודדת עם איזון מורכב בין צורכי החקלאות, הכלכלה והצרכנים.</td>
-                            </tr>
-                        </tbody>
+    <tr>
+        <td data-label="השחקן"><strong>מגדלים גדולים</strong></td>
+        <td data-label="סטטוס" class="status-win">✅ מנצחים</td>
+        <td data-label="הסיבה הטכנית">מרוויחים מהפער בין מחיר מכירה מלאכותי-גבוה לעלויות ייצור נמוכות.</td>
+        <td data-label="נקודת מבט מאוזנת">רואים עצמם כמגנים על ביטחון המזון והייצור המקומי.</td>
+    </tr>
+    <tr>
+        <td data-label="השחקן"><strong>חקלאי קטן/בינוני</strong></td>
+        <td data-label="סטטוס" class="status-lose">❌ מפסיד</td>
+        <td data-label="הסיבה הטכנית">מוכר במחיר גבוה אך עם עלויות גבוהות. שולי הרווח אפסיים וסופג את כל הסיכון.</td>
+        <td data-label="נקודת מבט מאוזנת">נאבק על הישרדות וזקוק לתמיכה ישירה כדי להתקיים.</td>
+    </tr>
+    <tr>
+        <td data-label="השחקן"><strong>רשתות שיווק</strong></td>
+        <td data-label="סטטוס" class="status-neutral">⚠️ מרוויח-מפסיד</td>
+        <td data-label="הסיבה הטכנית">מרוויחות מכוחן, אך סופגות עלויות בזבוז אדירות (עד 46%) ומגלגלות לצרכן.</td>
+        <td data-label="נקודת מבט מאוזנת">טוענות לרווח נקי נמוך (3-5%) ולתחרות קשה מול רשתות אחרות.</td>
+    </tr>
+    <tr>
+        <td data-label="השחקן"><strong>הצרכן</strong></td>
+        <td data-label="סטטוס" class="status-lose">❌ מפסיד ראשי</td>
+        <td data-label="הסיבה הטכנית">משלם מחיר סופי המגלם את כל כשלי המערכת: מחיר בסיס, תיווך ובזבוז.</td>
+        <td data-label="נקודת מבט מאוזנת">דורש שקיפות, תחרות הוגנת ומחירים ברי-השגה.</td>
+    </tr>
+    <tr>
+        <td data-label="השחקן"><strong>ממשלה</strong></td>
+        <td data-label="סטטוס" class="status-neutral">⚠️ אחראית-מתקנת</td>
+        <td data-label="הסיבה הטכנית">אחראית לכשלים רגולטוריים ותשתיתיים, אך גם מקדמת רפורמות.</td>
+        <td data-label="נקודת מבט מאוזנת">מתמודדת עם איזון מורכב בין צורכי החקלאות, הכלכלה והצרכנים.</td>
+    </tr>
+</tbody>
                     </table>
                 </div>
             </div>
