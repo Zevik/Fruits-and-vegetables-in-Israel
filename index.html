@@ -46,6 +46,11 @@
             overflow-x: hidden;
         }
 
+        html, body {
+            max-width: 100vw;
+            overflow-x: hidden;
+        }
+
         .container {
             width: 90%;
             max-width: 1100px;
@@ -444,6 +449,36 @@
                 width: 50px;
                 height: 50px;
             }
+            nav.compact {
+                padding: 0;
+                box-shadow: var(--shadow-md);
+            }
+            nav.compact .container {
+                padding: 0 10px;
+                justify-content: flex-start;
+            }
+            nav.compact ul {
+                flex-direction: row;
+                gap: 0;
+                width: auto;
+                overflow-x: auto;
+                justify-content: flex-start;
+            }
+            nav.compact ul li {
+                display: none;
+            }
+            nav.compact ul li.active {
+                display: block;
+            }
+            nav.compact ul li a {
+                font-size: 1.1rem;
+                padding: 10px 18px;
+                border-radius: 0;
+                background: var(--primary-color);
+                color: #fff;
+                font-weight: 700;
+                box-shadow: none;
+            }
         }
         
         /* --- עיצוב למסכים גדולים --- */
@@ -749,6 +784,18 @@
                         link.classList.add('active');
                     }
                 });
+
+                // Mobile compact nav after hero
+                if (window.innerWidth <= 480) {
+                    const hero = document.querySelector('.hero');
+                    if (window.scrollY > (hero.offsetHeight - navbar.offsetHeight)) {
+                        navbar.classList.add('compact');
+                    } else {
+                        navbar.classList.remove('compact');
+                    }
+                } else {
+                    navbar.classList.remove('compact');
+                }
             };
 
             window.addEventListener('scroll', onScroll, { passive: true });
