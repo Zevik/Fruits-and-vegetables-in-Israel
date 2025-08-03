@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>הונאה על הצלחת: התרשים האינטראקטיבי</title>
+    <style>
+        /* --- General Setup & Typography --- */
+        @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700&display=swap');
+
+        :root {
+            --primary-color: #34495E;
+            --secondary-color: #e74c3c;
+            --background-color: #F8F9FA;
+            --text-color: #2c3e50;
+            --accent-green: #27ae60;
+            --accent-yellow: #f1c40f;
+            --card-bg: #FFFFFF;
+            --shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        body {
+            font-family: 'Assistant', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            line-height: 1.7;
+            font-size: 18px;
+        }
+
+        /* --- Header & Intro --- */
+        .header {
+            text-align: center;
+            padding: 50px 20px;
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.3rem;
+            font-weight: 300;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* --- Main Journey Container --- */
+        .journey-container {
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 0 20px;
+            position: relative;
+        }
+
+        /* The connecting line */
+        .journey-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 50px;
+            width: 4px;
+            background-color: #dbe4f0;
+            transform: translateX(-50%);
+        }
+
+        /* --- Journey Step (Card) --- */
+        .step {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 60px;
+            position: relative;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+
+        .step.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .step-icon {
+            background-color: var(--card-bg);
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 45px;
+            box-shadow: var(--shadow);
+            border: 4px solid #dbe4f0;
+            margin-left: 30px; /* For RTL, margin-left pushes content to the right */
+            flex-shrink: 0;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .step-icon:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+        }
+
+        .step-content {
+            background-color: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            flex-grow: 1;
+            border-top: 5px solid;
+        }
+
+        .step h2 {
+            margin-top: 0;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .price-tag {
+            font-weight: 700;
+            font-size: 1.1rem;
+            padding: 5px 15px;
+            border-radius: 20px;
+            color: white;
+            display: inline-block;
+            margin-top: 15px;
+        }
+        
+        /* --- Color Coding for Steps & Actors --- */
+        #step-1 .step-content { border-color: #9b59b6; } /* Purple for Base Price */
+        #step-1 .price-tag { background-color: #9b59b6; }
+        
+        #step-2 .step-content { border-color: #e67e22; } /* Orange for Logistics */
+        #step-2 .price-tag { background-color: #e67e22; }
+
+        #step-3 .step-content { border-color: #3498db; } /* Blue for Retail */
+        #step-3 .price-tag { background-color: #3498db; }
+
+        #step-4 .step-content { border-color: var(--secondary-color); } /* Red for Final Price */
+        #step-4 .price-tag { background-color: var(--secondary-color); }
+
+        .actor-status {
+            font-weight: bold;
+            font-size: 0.9em;
+            padding: 3px 8px;
+            border-radius: 5px;
+            display: inline-block;
+        }
+        .status-winner { background-color: var(--accent-green); color: white; }
+        .status-loser { background-color: var(--secondary-color); color: white; }
+        .status-mixed { background-color: var(--accent-yellow); color: #333; }
+        .status-responsible { background-color: #7f8c8d; color: white; }
+
+        /* --- Modal (Popup) --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.visible {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        
+        .modal-overlay.visible .modal-content {
+             transform: scale(1);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #888;
+            cursor: pointer;
+            line-height: 1;
+        }
+        
+        .modal-content h3 {
+            margin-top: 0;
+            font-size: 1.8rem;
+            color: var(--primary-color);
+        }
+
+        .modal-content ul {
+            padding-right: 20px;
+        }
+        
+        .modal-content li {
+            margin-bottom: 10px;
+        }
+
+        /* --- Responsiveness --- */
+        @media (max-width: 768px) {
+            .header h1 { font-size: 2.2rem; }
+            .header p { font-size: 1.1rem; }
+
+            .journey-container::before {
+                right: 30px;
+            }
+
+            .step {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .step-icon {
+                margin-left: 0;
+                margin-bottom: 20px;
+                width: 80px;
+                height: 80px;
+                font-size: 35px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <h1>מסע העגבנייה: המנגנון הנסתר של יוקר המחיה</h1>
+        <p>תרשים אינטראקטיבי המפרק את שרשרת הכשלים בשוק הפירות והירקות בישראל. לחצו על הדמויות כדי לגלות יותר.</p>
+    </header>
+
+    <main class="journey-container">
+        <!-- Step 1: Artificial Base Price -->
+        <section class="step" id="step-1">
+            <div class="step-icon" data-modal-target="modal-growers">👨‍🌾</div>
+            <div class="step-content">
+                <h2>שלב 1: מחיר בסיס מלאכותי בשדה</h2>
+                <p>המסע מתחיל עוד לפני הקטיף. קבוצת מיעוט של <strong>מגדלים גדולים (20%)</strong>, השולטת ב-80% מהתוצרת, משתמשת בכוחה ב<strong>מועצת הצמחים</strong> כדי לפרסם "מחיר מומלץ" גבוה. זהו הרווח הראשון והמשמעותי של התאגידים, שנוצר בסביבה דמוית קרטל בחסות הפטור מחוק התחרות.</p>
+                <div class="price-tag">המחיר מתחיל להתנפח...</div>
+            </div>
+        </section>
+
+        <!-- Step 2: Logistics & Intermediation -->
+        <section class="step" id="step-2">
+            <div class="step-icon" data-modal-target="modal-retail">🛒</div>
+            <div class="step-content">
+                <h2>שלב 2: תיווך ריכוזי וחוסר יעילות</h2>
+                <p>בהיעדר שוק סיטונאי תחרותי, <strong>רשתות השיווק</strong> קונות את התוצרת במחיר הגבוה. המרכז הלוגיסטי (מרלו"ג) שלהן מוסיף למחיר עלויות תפעול אדירות ובעיקר את עלות <strong>הבזבוז והפחת (20%-46%)</strong>. את החקלאי הקטן, לעומת זאת, מאלצים למכור בתנאי "קונסיגנציה", כך שכל הסיכון נופל עליו.</p>
+                <div class="price-tag">עלויות תיווך ובזבוז נוספו!</div>
+            </div>
+        </section>
+
+        <!-- Step 3: External Factors & Small Farmer -->
+        <section class="step" id="step-3">
+            <div class="step-icon" data-modal-target="modal-small-farmer">🧑‍🌾</div>
+            <div class="step-content">
+                <h2>שלב 3: הסיכון נופל על החלש</h2>
+                <p><strong>החקלאי הקטן/בינוני</strong> הוא המפסיד המרכזי במערכת. הוא מוכר במחיר גבוה אך עלויותיו גבוהות גם כן, והוא סופג את כל הסיכון של סחורה שלא נמכרת או נפסלת. בנוסף, עלויות חיצוניות כמו <strong>מלחמה, מחסור בעובדים ומשבר האקלים</strong> מייקרות את הייצור עבור כולם, אך פוגעות בעיקר בו.</p>
+                <div class="price-tag">הסיכון והעלויות החיצוניות מגולמים במחיר</div>
+            </div>
+        </section>
+
+        <!-- Step 4: Final Price for Consumer -->
+        <section class="step" id="step-4">
+            <div class="step-icon" data-modal-target="modal-consumer">👤</div>
+            <div class="step-content">
+                <h2>שלב 4: המחיר הסופי לצרכן</h2>
+                <p>העגבנייה מגיעה למדף בחנות. למחיר, שכבר כולל את מחיר הבסיס המנופח, עלויות התיווך והבזבוז, מתווסף עכשיו גם <strong>המרווח הקמעונאי של הרשת</strong>. התוצאה: <strong>הצרכן</strong> משלם מחיר גבוה המגלם בתוכו את כל כשלי המערכת, ורחוק מאוד מהעלות המקורית של התוצרת.</p>
+                <div class="price-tag">המחיר הסופי: גבוה באופן בלתי נסבל</div>
+            </div>
+        </section>
+        
+         <!-- Step 5: The Government's Role -->
+        <section class="step" id="step-5">
+            <div class="step-icon" data-modal-target="modal-government">🏛️</div>
+            <div class="step-content" style="border-color: #7f8c8d;">
+                <h2>תפקיד הממשלה: אחריות מערכתית</h2>
+                <p>לממשלה תפקיד מכריע בכשל המערכתי: היא זו שמעניקה את הפטור מחוק התחרות, נמנעת מהקמת שוק סיטונאי, ומקיימת מודל תמיכה מעוות (מכסים במקום סובסידיות ישירות) שמנפח מחירים. גם ניסיונות ל"שקיפות מחירים" כשלו והפכו לכלי בידי הרשתות עצמן.</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modals -->
+    <div id="modal-growers" class="modal-overlay">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h3>👨‍🌾 מגדלים גדולים <span class="actor-status status-winner">מנצחים</span></h3>
+            <p><strong>תפקיד וסטטוס:</strong> קבוצת מיעוט חזקה (כ-20% מהמגדלים) השולטת ברוב התוצרת (כ-80%). הם המנצחים הראשיים של המערכת.</p>
+            <ul>
+                <li><strong>הסיבה הטכנית לרווח:</strong> נהנים מהפער בין מחיר מכירה מלאכותי-גבוה לעלויות ייצור נמוכות יחסית (יתרון לגודל).</li>
+                <li><strong>כלי הכוח:</strong> "חוק ה-20/80", שליטה במועצת הצמחים ופטור מחוק התחרות המאפשר תיאום מחירים.</li>
+                <li><strong>נקודת מבטם:</strong> רואים עצמם כמגני הייצור המקומי וביטחון המזון של ישראל.</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div id="modal-retail" class="modal-overlay">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h3>🛒 רשתות השיווק <span class="actor-status status-mixed">מרוויחות-מפסידות</span></h3>
+            <p><strong>תפקיד וסטטוס:</strong> פועלות כ"סיטונאי-על" ריכוזי. טוענות לרווח נקי נמוך (3-5%) אך בפועל מגלגלות 100% מעלויות חוסר היעילות והבזבוז על הצרכן.</p>
+            <ul>
+                <li><strong>הסיבה הטכנית לרווח:</strong> כוח קנייה ריכוזי המאפשר להכתיב תנאים לחקלאים, ופערי תיווך עצומים.</li>
+                <li><strong>החיסרון:</strong> סופגות עלויות תפעול ובזבוז אדירות במרכזים הלוגיסטיים שלהן (20%-46% מהסחורה).</li>
+                <li><strong>נקודת מבטם:</strong> טוענות לתחרות קשה בשוק הקמעונאות, אך בפועל פועלות בחוסר יעילות קיצוני שאת מחירו משלם הצרכן.</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div id="modal-small-farmer" class="modal-overlay">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h3>🧑‍🌾 חקלאי קטן/בינוני <span class="actor-status status-loser">מפסיד</span></h3>
+            <p><strong>תפקיד וסטטוס:</strong> הרוב הדומם של החקלאים, והמפסיד המרכזי מהמצב הקיים.</p>
+            <ul>
+                <li><strong>הסיבה הטכנית להפסד:</strong> מוכר במחיר גבוה אך עלויות הייצור שלו גבוהות ושולי הרווח אפסיים.</li>
+                <li><strong>הסיכון:</strong> סופג את כל הסיכון בעסקאות "קונסיגנציה" (תשלום רק על מה שנמכר) ודחיית סחורה שרירותית על ידי הרשתות.</li>
+                <li><strong>נקודת מבטם:</strong> נאבק על הישרדותו וזקוק נואשות לתמיכה ישירה מהמדינה כדי להתקיים.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="modal-consumer" class="modal-overlay">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h3>👤 הצרכן <span class="actor-status status-loser">מפסיד ראשי</span></h3>
+            <p><strong>תפקיד וסטטוס:</strong> המשלם הסופי והמפסיד הגדול ביותר מהמערכת כולה.</p>
+            <ul>
+                <li><strong>הסיבה הטכנית להפסד:</strong> משלם את המחיר הסופי, המגלם בתוכו את כל כשלי המערכת.</li>
+                <li><strong>מה מגולם במחיר:</strong>
+                    <ol>
+                        <li>מחיר בסיס מנופח של הקרטל.</li>
+                        <li>פערי תיווך של הרשתות.</li>
+                        <li>עלויות חוסר היעילות והבזבוז.</li>
+                        <li>היעדר תחרות אמיתית.</li>
+                    </ol>
+                </li>
+                <li><strong>דרישתו:</strong> שקיפות, תחרות הוגנת ומחירים ברי-השגה.</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div id="modal-government" class="modal-overlay">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h3>🏛️ הממשלה <span class="actor-status status-responsible">אחראית-מתקנת</span></h3>
+            <p><strong>תפקיד וסטטוס:</strong> אחראית לכשלים הרגולטוריים והתשתיתיים שיצרו את המצב, אך גם הגוף היחיד שיכול לקדם רפורמות ולתקן.</p>
+            <ul>
+                <li><strong>הכשלים באחריותה:</strong> הפטור לחקלאים מחוק התחרות, היעדר שוק סיטונאי לאומי, מדיניות תמיכה מעוותת (מכסים גבוהים), רגולציה לא אפקטיבית.</li>
+                <li><strong>האתגר:</strong> להתמודד עם קבוצות אינטרסים חזקות ולאזן בין צורכי החקלאים, הכלכלה והצרכנים.</li>
+                <li><strong>הפתרונות המוצעים במאמר:</strong> הקמת שוק סיטונאי, ביטול הפטור, מעבר לתמיכה ישירה, רגולציה על יחסי סחר הוגנים.</li>
+            </ul>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- Intersection Observer for scroll animations ---
+            const steps = document.querySelectorAll('.step');
+            
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                    }
+                });
+            }, {
+                threshold: 0.1 // Trigger when 10% of the element is visible
+            });
+
+            steps.forEach(step => {
+                observer.observe(step);
+            });
+
+            // --- Modal Logic ---
+            const modalTriggers = document.querySelectorAll('[data-modal-target]');
+            const modalOverlays = document.querySelectorAll('.modal-overlay');
+            const modalCloses = document.querySelectorAll('.modal-close');
+
+            modalTriggers.forEach(trigger => {
+                trigger.addEventListener('click', () => {
+                    const modalId = trigger.getAttribute('data-modal-target');
+                    const modal = document.getElementById(modalId);
+                    if (modal) {
+                        modal.classList.add('visible');
+                    }
+                });
+            });
+
+            const closeModal = (modal) => {
+                modal.classList.remove('visible');
+            };
+
+            modalCloses.forEach(button => {
+                button.addEventListener('click', () => {
+                    closeModal(button.closest('.modal-overlay'));
+                });
+            });
+
+            modalOverlays.forEach(overlay => {
+                overlay.addEventListener('click', (event) => {
+                    if (event.target === overlay) {
+                        closeModal(overlay);
+                    }
+                });
+            });
+            
+            // Close modal with Escape key
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape') {
+                    const visibleModal = document.querySelector('.modal-overlay.visible');
+                    if(visibleModal) {
+                        closeModal(visibleModal);
+                    }
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>בחן את עצמך: יוקר הפירות והירקות בישראל</title>
+    
+    <style>
+        /* --- Google Fonts --- */
+        @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;900&family=Rubik:wght@400;500;700&display=swap');
+
+        /* --- משתני עיצוב גלובליים --- */
+        :root {
+            --primary-color: #1a535c; /* ירוק-כחול עמוק */
+            --secondary-color: #4ecdc4; /* טורקיז בהיר */
+            --accent-color: #ff6b6b; /* קורל-אדום לדגשים */
+            --background-color: #f7fff7; /* ירקרק בהיר מאוד */
+            --text-color: #1d3557; /* כחול כהה לטקסט */
+            --correct-color: #2b9348; /* ירוק לתשובה נכונה */
+            --incorrect-color: #d00000; /* אדום לתשובה שגויה */
+            --card-bg: #ffffff;
+            --shadow: 0 10px 30px rgba(0, 50, 80, 0.1);
+            --font-header: 'Heebo', sans-serif;
+            --font-body: 'Rubik', sans-serif;
+            --border-radius: 15px;
+        }
+
+        /* --- עיצוב בסיסי --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* --- קונטיינר ראשי --- */
+        .quiz-container {
+            background-color: var(--background-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 700px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* --- אנימציות ומסכים --- */
+        .screen {
+            padding: clamp(20px, 5vw, 40px);
+            text-align: center;
+            width: 100%;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            display: none; /* מוסתר כברירת מחדל */
+        }
+
+        .screen.visible {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out forwards;
+        }
+
+        .screen.hidden {
+            animation: fadeOut 0.5s ease-in-out forwards;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-20px); pointer-events: none;}
+        }
+
+        /* --- מסך התחלה --- */
+        .quiz-title {
+            font-family: var(--font-header);
+            font-size: clamp(2rem, 5vw, 3.2rem);
+            font-weight: 900;
+            color: var(--primary-color);
+            line-height: 1.2;
+            margin-bottom: 15px;
+        }
+
+        .quiz-subtitle {
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            margin-bottom: 40px;
+            color: var(--text-color);
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .start-btn {
+            background: linear-gradient(45deg, var(--accent-color), #fca5a5);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            font-family: var(--font-header);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+        }
+        .start-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.6);
+        }
+
+        /* --- מסך השאלות --- */
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        #progress-text {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--primary-color);
+        }
+        
+        .progress-bar-container {
+            width: 70%;
+            height: 10px;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        #progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--secondary-color), var(--primary-color));
+            border-radius: 5px;
+            transition: width 0.4s ease-in-out;
+        }
+        
+        #question-text {
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            font-weight: 500;
+            margin-bottom: 30px;
+            min-height: 100px; /* מניעת קפיצות גובה */
+            color: var(--primary-color);
+            animation: fadeIn 0.5s;
+        }
+        
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .option-btn {
+            background-color: var(--card-bg);
+            border: 2px solid #e0e0e0;
+            color: var(--text-color);
+            padding: 15px;
+            width: 100%;
+            text-align: right;
+            font-size: 1.1rem;
+            font-family: var(--font-body);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .option-btn:hover:not([disabled]) {
+            border-color: var(--secondary-color);
+            transform: translateX(-5px);
+        }
+        
+        .option-btn.correct {
+            background-color: #e8f5e9;
+            border-color: var(--correct-color);
+            color: var(--correct-color);
+            font-weight: 700;
+        }
+        .option-btn.incorrect {
+            background-color: #ffebee;
+            border-color: var(--incorrect-color);
+            color: var(--incorrect-color);
+            font-weight: 700;
+        }
+        .option-btn.correct::after { content: ' ✔️'; }
+        .option-btn.incorrect::after { content: ' ✖️'; }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        .shake { animation: shake 0.5s ease-in-out; }
+
+        .quiz-footer {
+            margin-top: 30px;
+            height: 50px; /* גובה קבוע למניעת קפיצות */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #next-btn, #results-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 35px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            transform: scale(0);
+            opacity: 0;
+        }
+        #next-btn.active, #results-btn.active {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        /* --- מסך תוצאות --- */
+        #score-text {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+
+        #score-value {
+            font-family: var(--font-header);
+            font-size: clamp(5rem, 15vw, 8rem);
+            font-weight: 900;
+            color: var(--primary-color);
+            line-height: 1;
+        }
+
+        #score-feedback {
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin-top: 10px;
+            color: var(--primary-color);
+            min-height: 30px;
+        }
+
+        #results-summary {
+            margin-top: 30px;
+            text-align: right;
+        }
+        .result-item {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-right: 5px solid;
+            transition: transform 0.3s ease;
+        }
+        .result-item:hover {
+            transform: scale(1.02);
+        }
+        .result-item.correct { border-color: var(--correct-color); }
+        .result-item.incorrect { border-color: var(--incorrect-color); }
+
+        .result-question { font-weight: 700; margin-bottom: 10px; color: var(--primary-color); }
+        .result-answer { font-size: 0.95rem; }
+        .result-answer span { font-weight: 700; }
+        .your-answer.incorrect-text { color: var(--incorrect-color); }
+        .correct-answer-text { color: var(--correct-color); }
+
+    </style>
+</head>
+<body>
+
+    <div class="quiz-container">
+        
+        <!-- === מסך התחלה === -->
+        <div id="start-screen" class="screen visible">
+            <h1 class="quiz-title">מה באמת קובע את מחיר העגבנייה?</h1>
+            <p class="quiz-subtitle">בחן/י את הידע שלך על שוק הפירות והירקות בישראל וגלה/י את הכוחות שמאחורי יוקר המחיה בצלחת שלך.</p>
+            <button id="start-btn" class="start-btn">אני רוצה לדעת!</button>
+        </div>
+
+        <!-- === מסך שאלות === -->
+        <div id="quiz-screen" class="screen">
+            <div class="quiz-header">
+                <span id="progress-text">שאלה 1/10</span>
+                <div class="progress-bar-container">
+                    <div id="progress-bar"></div>
+                </div>
+            </div>
+            <h2 id="question-text">זוהי שאלת דוגמה. הטקסט יתעדכן כאן.</h2>
+            <div id="options-container" class="options-container">
+                <!-- כפתורי התשובות יווצרו כאן ע"י JS -->
+            </div>
+            <div class="quiz-footer">
+                <button id="next-btn">השאלה הבאה</button>
+                <button id="results-btn">גלה את התוצאות</button>
+            </div>
+        </div>
+
+        <!-- === מסך תוצאות === -->
+        <div id="results-screen" class="screen">
+            <h1 class="quiz-title">התוצאות שלך</h1>
+            <p id="score-text">הצלחת לענות נכון על:</p>
+            <div id="score-value">0</div>
+            <p style="color: var(--primary-color); font-size: 1.2rem;">שאלות מתוך 10</p>
+            <p id="score-feedback"></p>
+            <div id="results-summary">
+                <!-- סיכום התוצאות יווצר כאן ע"י JS -->
+            </div>
+            <button id="restart-btn" class="start-btn" style="margin-top: 30px;">לנסות שוב?</button>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const quizData = [
+                {
+                    question: "מהו הגורם המרכזי שמאפשר את המחירים הגבוהים לצרכן, עוד לפני שהסחורה מגיעה לרשתות השיווק?",
+                    options: ["מחירי המים והדשנים הגבוהים.", "ארגוני מגדלים גדולים המתאמים כמויות ייצור בחסות החוק.", "מחסור בעובדים זרים בחקלאות.", "עלויות שינוע גבוהות מהשדה למרכז הארץ."],
+                    answer: 1, // תיאום כמויות בחסות 'מועצת הצמחים' הוא גורם ייחודי לישראל שיוצר רצפת מחיר גבוהה.
+                },
+                {
+                    question: "איזה אחוז מהתוצרת החקלאית (פירות וירקות) בישראל מוערך כאובד או מושמד (פחת) בדרך מהשדה אל הצרכן?",
+                    options: ["אחוז זניח, סביב 5%-10%.", "כ-15%, בדומה לממוצע במדינות ה-OECD.", "אחוז עצום, בין שליש (כ-33%) לחצי מהתוצרת.", "הנתון אינו ידוע, אך מוערך כנמוך."],
+                    answer: 2, // דוחות שונים, כולל של לקט ישראל, מצביעים על אובדן מזון של כ-33% ואף יותר בשרשרת האספקה.
+                },
+                {
+                    question: "כאשר חקלאי קטן מוכר סחורה לרשת שיווק גדולה, מהי שיטת התשלום הנפוצה ביותר?",
+                    options: ["תשלום מיידי במזומן.", "'קונסיגנציה' - תשלום רק על מה שהרשת הצליחה למכור, כאשר הסיכון נשאר אצל החקלאי.", "תשלום שוטף+60.", "העברה בנקאית מראש לפי הערכת יבול."],
+                    answer: 1, // זו שיטה נפוצה שמעבירה את כל הסיכון לפחת ואי-מכירה אל החקלאי.
+                },
+                {
+                    question: "מהו מיתוס 'פערי התיווך' ומה הבעיה המרכזית בו בהקשר הישראלי?",
+                    options: ["המיתוס: סיטונאים מרוויחים המון. הבעיה: רשתות השיווק הן לרוב הסיטונאי של עצמן.", "המיתוס: הממשלה גוזרת קופון. הבעיה: המיסוי על פירות וירקות נמוך.", "המיתוס: החקלאים מרוויחים מעט. הבעיה: החקלאים הגדולים מרוויחים הרבה.", "המיתוס: אין תיווך. הבעיה: יש יותר מדי מתווכים בדרך."],
+                    answer: 0, // רשתות השיווק הגדולות עוקפות את השוק הסיטונאי וקונות ישירות מהמגדלים, כך שהן מתפקדות גם כסיטונאי וגם כקמעונאי.
+                },
+                {
+                    question: "כיצד מתחלק כוח הייצור של פירות וירקות בישראל?",
+                    options: ["הייצור מתחלק שווה בשווה בין כל החקלאים.", "כ-80% מהייצור מגיע מכ-80% מהחקלאים (הקטנים והבינוניים).", "רוב הייצור (כ-80%) נשלט על ידי מיעוט של מגדלים גדולים מאוד (כ-20%).", "רוב מוחלט של התוצרת הטרייה בישראל מגיע מיבוא."],
+                    answer: 2, // ענף החקלאות בישראל ריכוזי מאוד, ומאופיין בכלל פארטו (כלל 80/20).
+                },
+                {
+                    question: "מהי התשתית החיונית, שקיימת כמעט בכל מדינה מפותחת וחסרה בישראל, אשר הייתה יכולה להגביר תחרות ושקיפות?",
+                    options: ["רשת רכבות להובלת תוצרת חקלאית.", "שוק סיטונאי מרכזי, מודרני ומשוכלל.", "מערכת מכסות מים דיגיטלית.", "אפליקציה ממשלתית למכירה ישירה מהחקלאי לצרכן."],
+                    answer: 1, // היעדר שוק סיטונאי מוסדר מונע תחרות, שקיפות מחירים ומקשה על חקלאים קטנים.
+                },
+                {
+                    question: "האם החוק בישראל מתיר לגופי מגדלים גדולים לתאם ביניהם כמויות ייצור?",
+                    options: ["לא, זהו קרטל לא חוקי.", "כן, 'מועצת הצמחים' מעניקה להם פטור ייחודי מחוק התחרות.", "מותר לתאם כמויות אך אסור לתאם מחירים.", "הדבר היה מותר אך נאסר ברפורמה חקלאית לאחרונה."],
+                    answer: 1, // זהו לב ליבה של הבעיה המבנית: פטור חוקי המאפשר תיאום כמויות, שמשפיע ישירות על המחיר.
+                },
+                {
+                    question: "מהו 'פעילות מאזנת' שרשתות השיווק מבצעות, אשר עלולה לפגוע בחקלאים?",
+                    options: ["איזון מלאי בין סניפים שונים.", "יבוא מתחרה במחיר נמוך המוצג לחקלאי כאיום להורדת המחיר שהוא דורש.", "מבצעי הוזלות על חשבון החקלאי.", "תרומת עודפים לנזקקים."],
+                    answer: 1, // רשתות השיווק משתמשות בכוחן לייבא סחורה כדי להפעיל לחץ על המחירים שהן משלמות למגדלים המקומיים.
+                },
+                 {
+                    question: "מהו שיעור הרווח הגולמי הממוצע של רשתות השיווק על פירות וירקות?",
+                    options: ["הפסד תפעולי, הפריטים נועדו למשוך קונים.", "רווח נמוך של 5%-10%.", "רווח גבוה מאוד, לעיתים קרובות מעל 70% ואף 100%.", "רווח זהה לשאר מוצרי המזון, סביב 30%."],
+                    answer: 2, // דוחות וכתבות תחקיר הצביעו על מרווחים קמעונאיים (רווח גולמי) גבוהים מאוד, המגלמים בתוכם גם את עלויות הפחת הגבוהות של הרשת.
+                },
+                {
+                    question: "מהי אחת ההשלכות של היעדר שוק סיטונאי מוסדר על חקלאים קטנים?",
+                    options: ["הם נהנים ממכירה ישירה לצרכנים במחירים גבוהים יותר.", "הם נאלצים למכור את תוצרתם לרשתות הגדולות בתנאים שהן מכתיבות.", "המדינה רוכשת מהם את כל התוצרת במחיר מובטח.", "הם מתאגדים ופותחים רשת שיווק משלהם."],
+                    answer: 1, // ללא זירת מסחר מרכזית ותחרותית, לחקלאי הקטן אין כוח מיקוח והוא תלוי בחסדי הקניינים של הרשתות הגדולות.
+                }
+            ];
+
+            const screens = {
+                start: document.getElementById('start-screen'),
+                quiz: document.getElementById('quiz-screen'),
+                results: document.getElementById('results-screen')
+            };
+
+            const startBtn = document.getElementById('start-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const resultsBtn = document.getElementById('results-btn');
+            const restartBtn = document.getElementById('restart-btn');
+
+            const questionText = document.getElementById('question-text');
+            const optionsContainer = document.getElementById('options-container');
+            const progressText = document.getElementById('progress-text');
+            const progressBar = document.getElementById('progress-bar');
+            
+            const scoreValue = document.getElementById('score-value');
+            const scoreFeedback = document.getElementById('score-feedback');
+            const resultsSummary = document.getElementById('results-summary');
+
+            let currentQuestionIndex = 0;
+            let score = 0;
+            let userAnswers = [];
+            let answerSelected = false;
+
+            function switchScreen(currentScreen, nextScreen) {
+                screens[currentScreen].classList.add('hidden');
+                setTimeout(() => {
+                    screens[currentScreen].classList.remove('visible');
+                    screens[nextScreen].classList.remove('hidden');
+                    screens[nextScreen].classList.add('visible');
+                }, 500);
+            }
+
+            function startQuiz() {
+                currentQuestionIndex = 0;
+                score = 0;
+                userAnswers = [];
+                nextBtn.style.display = 'block';
+                resultsBtn.style.display = 'none';
+                switchScreen('start', 'quiz');
+                setTimeout(showQuestion, 500);
+            }
+
+            function showQuestion() {
+                resetState();
+                const currentQuestion = quizData[currentQuestionIndex];
+                questionText.innerText = currentQuestion.question;
+                
+                optionsContainer.innerHTML = '';
+                currentQuestion.options.forEach((option, index) => {
+                    const button = document.createElement('button');
+                    button.innerText = option;
+                    button.classList.add('option-btn');
+                    button.dataset.index = index;
+                    button.addEventListener('click', () => selectAnswer(index, button));
+                    optionsContainer.appendChild(button);
+                });
+
+                progressText.innerText = `שאלה ${currentQuestionIndex + 1}/${quizData.length}`;
+                progressBar.style.width = `${((currentQuestionIndex) / quizData.length) * 100}%`;
+                // Animate progress bar on next question load
+                setTimeout(() => {
+                    progressBar.style.width = `${((currentQuestionIndex + 1) / quizData.length) * 100}%`;
+                }, 100);
+            }
+
+            function resetState() {
+                answerSelected = false;
+                nextBtn.classList.remove('active');
+                resultsBtn.classList.remove('active');
+                questionText.style.animation = 'none';
+                void questionText.offsetWidth; // Trigger reflow
+                questionText.style.animation = 'fadeIn 0.5s';
+            }
+
+            function selectAnswer(selectedIndex, selectedButton) {
+                if (answerSelected) return;
+                answerSelected = true;
+
+                userAnswers[currentQuestionIndex] = selectedIndex;
+                const correctOptionIndex = quizData[currentQuestionIndex].answer;
+
+                Array.from(optionsContainer.children).forEach(button => {
+                    button.disabled = true;
+                    if (parseInt(button.dataset.index) === correctOptionIndex) {
+                        button.classList.add('correct');
+                    }
+                });
+
+                if (selectedIndex === correctOptionIndex) {
+                    score++;
+                } else {
+                    selectedButton.classList.add('incorrect');
+                    selectedButton.classList.add('shake');
+                }
+                
+                if (currentQuestionIndex < quizData.length - 1) {
+                    nextBtn.classList.add('active');
+                } else {
+                    nextBtn.style.display = 'none';
+                    resultsBtn.style.display = 'block';
+                    resultsBtn.classList.add('active');
+                }
+            }
+
+            function handleNextQuestion() {
+                if (!answerSelected) return;
+                currentQuestionIndex++;
+                showQuestion();
+            }
+            
+            function showResults() {
+                switchScreen('quiz', 'results');
+                setTimeout(() => {
+                    animateScore();
+                    displayResultsSummary();
+                    setScoreFeedback();
+                }, 500);
+            }
+            
+            function animateScore() {
+                scoreValue.innerText = 0;
+                let currentScore = 0;
+                const finalScore = score;
+                if (finalScore === 0) return;
+                
+                const increment = Math.max(1, Math.floor(finalScore / 10));
+                const interval = setInterval(() => {
+                    currentScore += increment;
+                    if (currentScore >= finalScore) {
+                        scoreValue.innerText = finalScore;
+                        clearInterval(interval);
+                    } else {
+                        scoreValue.innerText = currentScore;
+                    }
+                }, 100);
+            }
+
+            function setScoreFeedback() {
+                let feedback = "";
+                if (score <= 3) {
+                    feedback = "נראה שהמחירים בסופר מפתיעים אותך. יש הרבה מה לגלות!";
+                } else if (score <= 6) {
+                    feedback = "ידע לא רע! אתה מבין חלק מהכוחות שפועלים בשוק.";
+                } else if (score <= 9) {
+                    feedback = "מרשים מאוד! אתה מבין לעומק את המורכבות של יוקר המחיה.";
+                } else {
+                    feedback = "כל הכבוד! אתה מומחה אמיתי למחירי פירות וירקות!";
+                }
+                scoreFeedback.innerText = feedback;
+            }
+            
+            function displayResultsSummary() {
+                resultsSummary.innerHTML = '';
+                quizData.forEach((question, index) => {
+                    const resultItem = document.createElement('div');
+                    resultItem.classList.add('result-item');
+                    
+                    const userAnswerIndex = userAnswers[index];
+                    const correctAnswerIndex = question.answer;
+                    
+                    let resultHTML = `<p class="result-question">${index + 1}. ${question.question}</p>`;
+                    if (userAnswerIndex === correctAnswerIndex) {
+                        resultItem.classList.add('correct');
+                        resultHTML += `<p class="result-answer">התשובה שלך: <span class="correct-answer-text">${question.options[userAnswerIndex]}</span></p>`;
+                    } else {
+                        resultItem.classList.add('incorrect');
+                        resultHTML += `<p class="result-answer your-answer"><span class="incorrect-text">התשובה שלך: ${question.options[userAnswerIndex]}</span></p>`;
+                        resultHTML += `<p class="result-answer">התשובה הנכונה: <span class="correct-answer-text">${question.options[correctAnswerIndex]}</span></p>`;
+                    }
+                    
+                    resultItem.innerHTML = resultHTML;
+                    resultsSummary.appendChild(resultItem);
+                });
+            }
+
+            startBtn.addEventListener('click', startQuiz);
+            nextBtn.addEventListener('click', handleNextQuestion);
+            resultsBtn.addEventListener('click', showResults);
+            restartBtn.addEventListener('click', () => {
+                switchScreen('results', 'start');
+            });
+        });
+    </script>
+
+</body>
+</html>
